@@ -5,13 +5,15 @@ import json
 
 RESPONSES = {
     FlagStatus.ACCEPTED: [
-        "accepted",
+        "ACCEPTED",
     ],
     FlagStatus.REJECTED: [
-        "old",
+        "DENIED",
     ],
     FlagStatus.SKIPPED:
-    ["Game is not available.", "already stolen", "own", "NOP"]
+    ["Game is not available.", "already stolen", "own", "NOP",],
+    FlagStatus.QUEUED:
+    ["RESUBMIT", "ERROR"]
 }
 
 
@@ -19,15 +21,15 @@ def submit_flags(flags, config):
 
     flags_to_send = [item.flag for item in flags]
     # app.logger.warning(flags_to_send)
-    resps = requests.put(f"http://{config['SYSTEM_HOST']}/flags",
-                         headers={"X-Team-Token": "fe56ef438aa1377c"},
+    resps = requests.put(f"http://{config['SYSTEM_HOST']}:8080/flags",
+                         headers={"X-Team-Token": "<TOKEN_TEAM>"},
                          json=flags_to_send)
     #app.logger.warning(resps.text)
     resps = resps.json()
     for result in resps:
         app.logger.warning(result)
         for status, substrings in RESPONSES.items():
-            if any(s in result["msg"] for s in substrings):
+            if any(s in result["status"] for s in substrings):#PER TEST MESSO SU STATUS
                 found_status = status
                 break
         else:

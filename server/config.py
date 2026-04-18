@@ -15,7 +15,7 @@ CONFIG = {
     # This configures how and where to submit flags.
     # The protocol must be a module in protocols/ directory.
 
-    'SYSTEM_PROTOCOL': 'ccit',
+    'SYSTEM_PROTOCOL': 'ccitTEST',
     'ATTACK_INFO': "http://10.10.0.1:8081/flagIds",
     'ATTACK_INFO_ENDPOINT': "http://10.10.0.1:8081/flagIds",
     'SYSTEM_HOST': '192.168.1.4',#mettere indirizzo gameserver

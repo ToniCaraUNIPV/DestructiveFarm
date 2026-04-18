@@ -96,8 +96,11 @@ def run_loop():
         )
         for item in old_flags
     ]
-
-    _update_metrics(db, old_flags)
+    try:
+        _update_metrics(db, processed_flags)
+    except Exception as e:
+        app.logger.error("Error updating metrics (non-fatal): %s", e)
+    
 
     cycle = db.execute("SELECT MAX(sent_cycle) AS last_cycle FROM flags").fetchone()[
         "last_cycle"
@@ -124,7 +127,18 @@ def run_loop():
         cursor = db.execute(
             "SELECT * FROM flags WHERE status = ?", (FlagStatus.QUEUED.name,)
         )
-        queued_flags = [Flag(**item) for item in cursor.fetchall()]
+        queued_flags = [
+            Flag(
+                flag=item["flag"],
+                sploit=item["sploit"],
+                team=item["team"],
+                time=item["time"],
+                status=FlagStatus[item["status"]],  # stringa → enum
+                checksystem_response=item["checksystem_response"],
+                sent_cycle=item["sent_cycle"],
+            )
+            for item in cursor.fetchall()
+        ]
         queued_flags_len = len(queued_flags)
 
         if queued_flags:
@@ -182,7 +196,10 @@ def run_loop():
                 len(sent_flags),
                 queued_flags_len,
             )
-            _update_metrics(db, processed_flags)
+            try:
+                _update_metrics(db, processed_flags)
+            except Exception as e:
+                app.logger.error("Error updating metrics (non-fatal): %s", e)
 
             flag_ann.announce((cycle, processed_flags))
 

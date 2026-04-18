@@ -1,7 +1,7 @@
-FROM python:3-slim
+FROM python:3.10-slim
 
 # Install Poetry
-ENV POETRY_VERSION "1.1.13"
+ENV POETRY_VERSION "1.8.3"
 RUN pip install poetry==${POETRY_VERSION}
 RUN poetry config virtualenvs.create false
 
@@ -14,10 +14,11 @@ RUN poetry install
 COPY server/ ./
 
 ENV FLAGS_DATABASE=/var/destructivefarm/flags.sqlite 
-ENV FLASK_APP=/opt/server/standalone.py
+ENV FLASK_APP=standalone
+ENV PYTHONPATH=/opt/server
 
 VOLUME [ "/var/destructivefarm" ]
 EXPOSE 5000
 
 # Run the application:
-ENTRYPOINT "cd ./server && ./server/start_server.sh"
+ENTRYPOINT ["/bin/sh", "-c", "chmod +x ./start_server.sh && ./start_server.sh"]

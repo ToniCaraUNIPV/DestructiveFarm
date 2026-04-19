@@ -29,6 +29,8 @@ def _update_metrics(db: Connection, processed_flags: List[Flag]):
         metrics.QUEUED_FLAGS.set(0)
 
     for flag in processed_flags:
+        if flag.status == FlagStatus.QUEUED:
+            continue
         metrics.FLAGS[flag.status].labels(sploit=flag.sploit, team=flag.team).inc()
 
 
